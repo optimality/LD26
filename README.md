@@ -1,6 +1,13 @@
 Tower Defense Rewind
 ====================
 
+Task List
+---------
+* Waves of enemies
+* Sound Effects / Music
+* Low Score List
+
+
 Gameplay
 --------
 
@@ -13,7 +20,7 @@ Extremely minimalist art - primary colors, black and white.  Basic geometric sha
 
 Themes
 ------
-The main theme of LD26 is "minimalism."  Wikipedia says minimalism is an art movement whose goal is to "expose the essence or identify of a subject through eliminating all non-essential forms, features, or concepts" and that a major part of it is "repetition and iteration."
+The theme of LD26 is "minimalism."  Wikipedia says minimalism is an art movement whose goal is to "expose the essence or identify of a subject through eliminating all non-essential forms, features, or concepts" and that a major part of it is "repetition and iteration."
 
 Repetition is incorporated into the game through the wave structure and successive levels.
 
