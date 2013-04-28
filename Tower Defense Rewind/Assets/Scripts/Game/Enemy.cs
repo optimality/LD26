@@ -8,16 +8,22 @@ public class Enemy : MonoBehaviour {
   public float age;
 
   private Game game;
-  private Vector3 target;
+  public Vector3 target;
+  private bool removed;
 
   public void Remove() {
+    if (removed) {
+      return;
+    }
     game.RemoveEnemy();
     Destroy(this.gameObject);
+    removed = true;
   }
 
   void Start() {
     target = new Vector3(transform.position.x, transform.position.y, 0);
     game = (Game)FindObjectOfType(typeof(Game));
+    removed = false;
   }
 
   void Update() {

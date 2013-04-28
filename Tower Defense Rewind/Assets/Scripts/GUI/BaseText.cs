@@ -7,6 +7,6 @@ public class BaseText : MonoBehaviour {
 
   // Update is called once per frame
   void Update() {
-    guiText.text = string.Format("BASE: {0}", game.baseHP);
+    guiText.text = string.Format("{0}", game.baseHP);
   }
 }

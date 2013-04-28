@@ -3,9 +3,10 @@ Tower Defense Rewind
 
 Task List
 ---------
-* Waves of enemies
-* Sound Effects / Music
-* Low Score List
+* Content
+* Sound effect for base damage
+* Better music
+* Jingles for starting a round / ending a wave / etc.
 
 
 Gameplay
