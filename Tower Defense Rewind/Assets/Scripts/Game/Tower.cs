@@ -1,14 +1,19 @@
 using UnityEngine;
-using System.Collections;
 
 public class Tower : MonoBehaviour {
   public GameObject projectilePrefab;
+  public GameObject rangeIndicator;
   public float range;
   public LayerMask enemyLayer;
   public float fireTime;
   public float fireHeight;
+  [HideInInspector]
+  public bool hover;
 
   public AudioSource laser;
+
+  public Color chargingColor;
+  public Color readyColor;
 
   private float fireCooldown;
   private Game game;
@@ -21,11 +26,15 @@ public class Tower : MonoBehaviour {
   void Start() {
     game = transform.parent.GetComponent<Game>();
     fireCooldown = fireTime;
+    hover = false;
   }
 
   void Update() {
-    fireCooldown += Time.deltaTime;
+    rangeIndicator.SetActive(hover);
+    hover = false;
+
     if (fireCooldown >= fireTime) {
+      renderer.material.color = readyColor;
       Enemy oldestEnemy = null;
       float oldestAge = 0;
       Collider[] collidersInRange = Physics.OverlapSphere(transform.position, range, enemyLayer);
@@ -39,6 +48,9 @@ public class Tower : MonoBehaviour {
       if (oldestEnemy != null) {
         Fire(FindInterceptPoint(projectilePrefab.GetComponent<Projectile>().speed, oldestEnemy));
       }
+    } else {
+      fireCooldown += Time.deltaTime;
+      renderer.material.color = Color.Lerp(chargingColor, readyColor, fireCooldown / fireTime);
     }
   }
 
@@ -50,13 +62,14 @@ public class Tower : MonoBehaviour {
     float a = projectileSpeed * projectileSpeed - enemy.speed * enemy.speed;
     float b = -2 * Vector3.Dot(enemyVelocity, vectorToEnemy);
     float c = -vectorToEnemy.sqrMagnitude;
-    float timeToIntercept = (b + Mathf.Sqrt(b * b - 4 * a *c)) / (2 * a);
+    float timeToIntercept = (b + Mathf.Sqrt(b * b - 4 * a * c)) / (2 * a);
     return timeToIntercept * enemyVelocity + enemy.transform.position;
   }
 
   void Fire(Vector3 location) {
     laser.Play();
     fireCooldown = 0;
+    renderer.material.color = chargingColor;
     GameObject projectile = (GameObject)Instantiate(projectilePrefab,
           transform.position + new Vector3(0, 0, fireHeight),
           Quaternion.LookRotation(location - transform.position));

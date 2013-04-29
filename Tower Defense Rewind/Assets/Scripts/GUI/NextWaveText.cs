@@ -5,12 +5,37 @@ public class NextWaveText : MonoBehaviour {
   public Game game;
   public GameObject totalScore;
 
+  public string bestString;
+  public string goodString;
+  public string badString;
+  public float goodThreshold;
+
   void Update() {
     if (game.wave == game.waves.Length) {
       totalScore.SetActive(false);
     } else {
       totalScore.SetActive(true);
     }
-    guiText.text = string.Format("WAVE {0} IN {1:D}", game.wave, (int)game.waveTimer);
+
+    if (game.wave <= 0) {
+      guiText.text = string.Format("LEVEL COMPLETE: {0}", FinalRating());
+    } else {
+      guiText.text = string.Format("WAVE {0} IN {1:D}", game.wave, (int)game.waveTimer);
+    }
+  }
+
+  string FinalRating() {
+    int finalTarget = 0;
+    foreach (int target in game.levelScores[game.level - 1].waveScore) {
+      finalTarget += target;
+    }
+    
+    if (game.score <= finalTarget) {
+      return bestString;
+    } else if (game.score <= finalTarget * goodThreshold) {
+      return goodString;
+    } else {
+      return badString;
+    }
   }
 }

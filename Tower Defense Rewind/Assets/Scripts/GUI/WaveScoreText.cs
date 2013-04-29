@@ -5,6 +5,6 @@ public class WaveScoreText : MonoBehaviour {
   public Game game;
 
   void Update() {
-    guiText.text = string.Format("WAVE SCORE {0}", game.WaveScore());
+    guiText.text = string.Format("{0}", game.WaveScore());
   }
 }

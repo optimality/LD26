@@ -6,10 +6,12 @@ public class WaveText : MonoBehaviour {
   public int wave;
 
   void Update() {
-    if (game.wave >= wave) {
-      guiText.text = string.Format("{0}", game.waves[wave - 1]);
-    } else {
+    if (game.wave - wave < 1) {
       guiText.text = "";
+    } else if (wave == 0) {
+      guiText.text = string.Format("{0}", game.enemies);
+    } else {
+      guiText.text = string.Format("{0}", game.waves[game.wave - wave - 1]);
     }
   }
 }

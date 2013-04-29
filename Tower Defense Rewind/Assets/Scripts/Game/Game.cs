@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Serialization;
+using System;
 
 public class Game : MonoBehaviour {
   public GameObject wallPrefab;
@@ -16,6 +17,7 @@ public class Game : MonoBehaviour {
 
   public AudioSource explosion;
   public AudioSource towerRemove;
+  public AudioSource baseExplosion;
 
   public float selectDistance;
   public LayerMask selectionMask;
@@ -31,6 +33,12 @@ public class Game : MonoBehaviour {
   public int level;
   public int[] waves;
 
+  [Serializable]
+  public class WaveScores {
+    public int[] waveScore;
+  }
+  public WaveScores[] levelScores;
+
   public Map map;
   private List<GameObject> levelObjects;
   private IDictionary<Square, GameObject> prefabMap;
@@ -44,17 +52,13 @@ public class Game : MonoBehaviour {
   [HideInInspector]
   public float waveTimer;
   [HideInInspector]
-  public int? lowestScore;
-  [HideInInspector]
   public int wave;
-  [HideInInspector]
-  public bool newLowestScore;
   [HideInInspector]
   public int baseHP;
   [HideInInspector]
   public Vector3[,] directionToMove;
 
-  private Spawner spawner;
+  private List<Spawner> spawners;
   private GameObject @base;
 
   public enum Mode {
@@ -62,7 +66,7 @@ public class Game : MonoBehaviour {
     LEVEL_SELECT,
     NEXT_WAVE,
     PLAY,
-    WIN,
+    SURVIVE,
     LOSE,
   }
 
@@ -71,15 +75,12 @@ public class Game : MonoBehaviour {
 
   public void DamageBase() {
     baseHP--;
+    baseExplosion.Play();
   }
 
   public void RemoveEnemy() {
     explosion.Play();
     enemies--;
-  }
-
-  private string LowestScoreString() {
-    return string.Format("score{0}", level);
   }
 
   void Start() {
@@ -97,7 +98,6 @@ public class Game : MonoBehaviour {
   }
 
   public void LoadLevel(int level) {
-    Debug.Log(string.Format("Loading level {0}", level));
     this.level = level;
     mode = Mode.NEXT_WAVE;
     guiManager.NextWave();
@@ -114,12 +114,6 @@ public class Game : MonoBehaviour {
     score = 0;
     baseHP = startingBaseHP;
     waveTimer = timeBetweenWaves;
-    if (PlayerPrefs.HasKey(LowestScoreString())) {
-      lowestScore = PlayerPrefs.GetInt(LowestScoreString());
-    } else {
-      lowestScore = null;
-    }
-    newLowestScore = false;
   }
 
   void Clear() {
@@ -132,15 +126,17 @@ public class Game : MonoBehaviour {
     background.SetActive(false);
   }
 
+  void LevelSelect() {
+    Clear();
+    mode = Mode.LEVEL_SELECT;
+    guiManager.SelectLevel();
+  }
+
   public int WaveScore() {
     return baseHP * basePoints + towers * towerPoints;
   }
 
   void Update() {
-    if (Input.GetButtonDown("Clear Low Score")) {
-      PlayerPrefs.DeleteKey(LowestScoreString());
-      lowestScore = null;
-    }
     switch (mode) {
     case Mode.START:
       UpdateStart();
@@ -162,8 +158,8 @@ public class Game : MonoBehaviour {
       UpdateLose();
       break;
 
-    case Mode.WIN:
-      UpdateWin();
+    case Mode.SURVIVE:
+      UpdateSurvive();
       break;
     }
   }
@@ -180,6 +176,10 @@ public class Game : MonoBehaviour {
   }
 
   void UpdateNextWave() {
+    if (Input.GetButtonDown("Back")) {
+      LevelSelect();
+      return;
+    }
     waveTimer -= Time.deltaTime;
     if (waveTimer > 0 && !Input.GetButtonDown("Click")) {
       return;
@@ -188,20 +188,29 @@ public class Game : MonoBehaviour {
     guiManager.PlayGame();
     mode = Mode.PLAY;
     waveTimer = timeBetweenWaves;
-    spawner.numEnemies = waves[wave - 1];
-    enemies = spawner.numEnemies;
+    enemies = 0;
+    foreach (Spawner spawner in spawners) {
+      spawner.numEnemies = waves[wave - 1];
+      enemies += spawner.numEnemies;
+    }
   }
 
   void UpdatePlay() {
-    if (Input.GetButtonDown("Click")) {
-      RaycastHit hit;
-      Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-      if (Physics.Raycast(ray, out hit, selectDistance, selectionMask)) {
-        Tower tower = hit.collider.GetComponent<Tower>();
+    if (Input.GetButtonDown("Back")) {
+      LevelSelect();
+      return;
+    }
+    RaycastHit hit;
+    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    if (Physics.Raycast(ray, out hit, selectDistance, selectionMask)) {
+      Tower tower = hit.collider.GetComponent<Tower>();
+      if (Input.GetButtonDown("Click")) {
         map[tower.transform.position] = Square.EMPTY;
         ShortestPaths();
         tower.Remove();
         towers--;
+      } else {
+        tower.hover = true;
       }
     }
     if (baseHP <= 0) {
@@ -212,15 +221,8 @@ public class Game : MonoBehaviour {
       score += WaveScore();
       --wave;
       if (wave == 0) {
-        guiManager.WinGame();
-        mode = Mode.WIN;
-        if (!lowestScore.HasValue || (lowestScore.HasValue && score < lowestScore.Value)) {
-          newLowestScore = true;
-          lowestScore = score;
-          PlayerPrefs.SetInt(LowestScoreString(), lowestScore.Value);
-        } else {
-          newLowestScore = false;
-        }
+        guiManager.SurviveGame();
+        mode = Mode.SURVIVE;
       } else {
         guiManager.NextWave();
         mode = Mode.NEXT_WAVE;
@@ -229,24 +231,21 @@ public class Game : MonoBehaviour {
   }
 
   void UpdateLose() {
-    if (Input.GetButtonDown("Click")) {
-      Clear();
-      mode = Mode.LEVEL_SELECT;
-      guiManager.SelectLevel();
+    if (Input.GetButtonDown("Click") || Input.GetButtonDown("Back")) {
+      LevelSelect();
     }
   }
 
-  void UpdateWin() {
-    if (Input.GetButtonDown("Click")) {
-      Clear();
-      mode = Mode.LEVEL_SELECT;
-      guiManager.SelectLevel();
+  void UpdateSurvive() {
+    if (Input.GetButtonDown("Click") || Input.GetButtonDown("Back")) {
+      LevelSelect();
     }
   }
 
   void BuildMap() {
     towers = 0;
     Vector3 position = Vector3.zero;
+    spawners = new List<Spawner>();
     for (position.x = 0; position.x < map.width; ++position.x) {
       for (position.y = 0; position.y < map.height; ++position.y) {
         Square type = map[position];
@@ -258,7 +257,7 @@ public class Game : MonoBehaviour {
             prefab.transform.localRotation);
           obj.transform.parent = transform;
           if (type == Square.SPAWNER) {
-            spawner = obj.GetComponent<Spawner>();
+            spawners.Add(obj.GetComponent<Spawner>());
           } else if (type == Square.BASE) {
             @base = obj;
           } else if (type == Square.TOWER) {

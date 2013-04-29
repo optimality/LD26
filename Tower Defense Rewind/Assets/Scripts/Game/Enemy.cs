@@ -6,9 +6,10 @@ public class Enemy : MonoBehaviour {
 
   [HideInInspector]
   public float age;
+  [HideInInspector]
+  public Vector3 target;
 
   private Game game;
-  public Vector3 target;
   private bool removed;
 
   public void Remove() {

@@ -5,7 +5,7 @@ public class GUIManager : MonoBehaviour {
   public GameObject[] startScreen;
   public GameObject[] levelScreen;
   public GameObject[] gameScreen;
-  public GameObject[] winScreen;
+  public GameObject[] surviveScreen;
   public GameObject[] loseScreen;
   public GameObject[] waveScreen;
 
@@ -30,8 +30,8 @@ public class GUIManager : MonoBehaviour {
     EnableScreen(gameScreen);
   }
 
-  public void WinGame() {
-    EnableScreen(winScreen);
+  public void SurviveGame() {
+    EnableScreen(surviveScreen);
   }
 
   public void LoseGame() {

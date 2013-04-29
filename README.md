@@ -3,6 +3,8 @@ Tower Defense Rewind
 
 Task List
 ---------
+* Level ratings
+* Tower recharge feedback?
 * Content
 * Sound effect for base damage
 * Better music
