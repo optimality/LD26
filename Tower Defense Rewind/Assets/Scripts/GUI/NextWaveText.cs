@@ -20,7 +20,7 @@ public class NextWaveText : MonoBehaviour {
     if (game.wave <= 0) {
       guiText.text = string.Format("LEVEL COMPLETE: {0}", FinalRating());
     } else {
-      guiText.text = string.Format("WAVE {0} IN {1:D}", game.wave, (int)game.waveTimer);
+      guiText.text = string.Format("CLICK FOR WAVE {0}", game.wave);
     }
   }
 

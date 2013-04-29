@@ -23,10 +23,13 @@ public class Tower : MonoBehaviour {
     Destroy(this.gameObject);
   }
 
-  void Start() {
-    game = transform.parent.GetComponent<Game>();
+  public void Reset() {
     fireCooldown = fireTime;
     hover = false;
+  }
+
+  void Start() {
+    game = transform.parent.GetComponent<Game>();
   }
 
   void Update() {

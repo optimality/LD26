@@ -27,8 +27,6 @@ public class Game : MonoBehaviour {
   public int basePoints;
   public int towerPoints;
 
-  public float timeBetweenWaves;
-
   public Texture2D[] levels;
   public int level;
   public int[] waves;
@@ -48,9 +46,7 @@ public class Game : MonoBehaviour {
   [HideInInspector]
   public int enemies;
   [HideInInspector]
-  public int towers;
-  [HideInInspector]
-  public float waveTimer;
+  public int numTowers;
   [HideInInspector]
   public int wave;
   [HideInInspector]
@@ -59,6 +55,7 @@ public class Game : MonoBehaviour {
   public Vector3[,] directionToMove;
 
   private List<Spawner> spawners;
+  private List<Tower> towers;
   private GameObject @base;
 
   public enum Mode {
@@ -113,7 +110,6 @@ public class Game : MonoBehaviour {
     wave = waves.Length;
     score = 0;
     baseHP = startingBaseHP;
-    waveTimer = timeBetweenWaves;
   }
 
   void Clear() {
@@ -133,7 +129,7 @@ public class Game : MonoBehaviour {
   }
 
   public int WaveScore() {
-    return baseHP * basePoints + towers * towerPoints;
+    return baseHP * basePoints + numTowers * towerPoints;
   }
 
   void Update() {
@@ -180,15 +176,16 @@ public class Game : MonoBehaviour {
       LevelSelect();
       return;
     }
-    waveTimer -= Time.deltaTime;
-    if (waveTimer > 0 && !Input.GetButtonDown("Click")) {
+    if (!Input.GetButtonDown("Click")) {
       return;
     }
 
     guiManager.PlayGame();
     mode = Mode.PLAY;
-    waveTimer = timeBetweenWaves;
     enemies = 0;
+    foreach (Tower tower in towers) {
+      tower.Reset();
+    }
     foreach (Spawner spawner in spawners) {
       spawner.numEnemies = waves[wave - 1];
       enemies += spawner.numEnemies;
@@ -208,7 +205,7 @@ public class Game : MonoBehaviour {
         map[tower.transform.position] = Square.EMPTY;
         ShortestPaths();
         tower.Remove();
-        towers--;
+        numTowers--;
       } else {
         tower.hover = true;
       }
@@ -243,9 +240,10 @@ public class Game : MonoBehaviour {
   }
 
   void BuildMap() {
-    towers = 0;
+    numTowers = 0;
     Vector3 position = Vector3.zero;
     spawners = new List<Spawner>();
+    towers = new List<Tower>();
     for (position.x = 0; position.x < map.width; ++position.x) {
       for (position.y = 0; position.y < map.height; ++position.y) {
         Square type = map[position];
@@ -261,7 +259,8 @@ public class Game : MonoBehaviour {
           } else if (type == Square.BASE) {
             @base = obj;
           } else if (type == Square.TOWER) {
-            towers++;
+            numTowers++;
+            towers.Add(obj.GetComponent<Tower>());
           }
           levelObjects.Add(obj);
         }

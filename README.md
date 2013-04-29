@@ -1,34 +1,27 @@
 Tower Defense Rewind
 ====================
 
-Task List
----------
-* Level ratings
-* Tower recharge feedback?
-* Content
-* Sound effect for base damage
-* Better music
-* Jingles for starting a round / ending a wave / etc.
-
-
 Gameplay
 --------
 
-The player starts with a "complete" tower defense system.  They start with the toughest wave of enemies and face successively weaker waves.  The only action the player can take is to remove their own towers.  They get points each wave for the number of towers they have.  The goal is to get the *lowest* score without losing.
+The player starts with a "complete" tower defense system.  They start with the toughest wave of enemies and face successively weaker waves.  The only action the player can take is to remove their own towers.  They get points each wave for the number of towers they have and the amount of health their base has left.  The goal is to get the *lowest* score without losing.
 
-Art
----
-
-Extremely minimalist art - primary colors, black and white.  Basic geometric shapes - squares for walls, circles for towers, triangles for enemies, lines for projectiles.
-
-Themes
+Theme
 ------
-The theme of LD26 is "minimalism."  Wikipedia says minimalism is an art movement whose goal is to "expose the essence or identify of a subject through eliminating all non-essential forms, features, or concepts" and that a major part of it is "repetition and iteration."
+The theme of LD26 is "minimalism."  Minimalism involves reducing something to its barest essence.  In TDR, the player has an overly-complex tower defense system and is tasked with reducing it to the barest form they need to survive.
 
-Repetition is incorporated into the game through the wave structure and successive levels.
+The player has a minimal set of actions he or she can take: removing towers.
 
-The essential parts of a tower defense game are mobs and their path(s) through the space, and towers and their distribution.  The only necessary player action is building towers in regular tower defense, so removing them is the only necessary one in Rewind.
+One of the most basic gameplay mechanics is the risk/reward tradeoff.  In TDR, the player can take larger risks by destroying towers earlier in the level and reap a larger reward by having those towers counted in fewer waves.  Destroy too many, though, and the player risks losing.
 
-Similarly, one of the most basic kinds of games is the risk/reward tradeoff.  This game exposes that mechanic in one of the barest ways possible.
+Repetition is an important part of minimalism and is incorporated into the game through the wave structure and successive levels.
 
-The player is, of course, also trying to strip their defenses down the minimum necessary - to expose the essence of their defense without redundant parts.
+Tools
+-----
+I used Unity Free, Reaper, BFXR, and Pickle in the making of this game.  Thanks to their creators.
+
+Production
+----------
+The creation of this game was streamed on twitch.tv/optimality, blogged on realityfoil.com, and a timelapse video is posted at http://www.youtube.com/watch?v=fQQmox51dzg.
+
+Thanks to all of my playtesters for your excellent feedback.

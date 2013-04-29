@@ -5,6 +5,6 @@ public class TowerText : MonoBehaviour {
   public Game game;
 
   void Update() {
-    guiText.text = string.Format("{0}", game.towers * game.towerPoints);
+    guiText.text = string.Format("{0}", game.numTowers * game.towerPoints);
   }
 }
