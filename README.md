@@ -1,6 +1,8 @@
 Tower Defense Rewind
 ====================
 
+Visit [the website](http://ludumdare.com/compo/ludum-dare-26/?action=preview&uid=20946) to play in-browser!
+
 Gameplay
 --------
 
